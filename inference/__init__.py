@@ -1,0 +1,6 @@
+# Inference modules
+from .predictor import BasePredictor
+from .spine_predictor import SpineLocalizationPredictor
+from .vertebrae_predictor import VertebraeLocalizationPredictor
+from .segmentation_predictor import VertebraeSegmentationPredictor
+from .full_pipeline import FullPipelinePredictor
