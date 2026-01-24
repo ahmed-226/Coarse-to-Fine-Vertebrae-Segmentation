@@ -1,0 +1,26 @@
+# Sample Dataset CSV
+# Format: name,type,image_path,mask_path,centroid_json_path
+#
+# Columns:
+#   - name: Unique identifier for the sample
+#   - type: 'train' or 'val' (optional, for fixed splits)
+#   - image_path: Path to CT image (NIfTI format)
+#   - mask_path: Path to segmentation mask (multi-label NIfTI)
+#   - centroid_json_path: Path to JSON file with vertebra centroids
+#
+
+name,type,image_path,mask_path,centroid_json_path
+verse004,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse004/sub-verse004_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse004/sub-verse004_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse004/sub-verse004_seg-vb_ctd.json
+verse006,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse006/sub-verse006_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse006/sub-verse006_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse006/sub-verse006_seg-vb_ctd.json
+verse007,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse007/sub-verse007_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse007/sub-verse007_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse007/sub-verse007_seg-vb_ctd.json
+verse008,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse008/sub-verse008_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse008/sub-verse008_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse008/sub-verse008_seg-vb_ctd.json
+verse009,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse009/sub-verse009_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse009/sub-verse009_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse009/sub-verse009_seg-vb_ctd.json
+verse010,validation,/kaggle/input/verse-19-3d-images/dataset-verse19validation/rawdata/sub-verse010/sub-verse010_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse010/sub-verse010_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse010/sub-verse010_seg-vb_ctd.json
+verse011,validation,/kaggle/input/verse-19-3d-images/dataset-verse19validation/rawdata/sub-verse011/sub-verse011_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse011/sub-verse011_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse011/sub-verse011_seg-vb_ctd.json
+verse012,test,/kaggle/input/verse-19-3d-images/dataset-verse19test/rawdata/sub-verse012/sub-verse012_ct.nii,,/kaggle/input/verse-19-3d-images/dataset-verse19test/derivatives/sub-verse012/sub-verse012_seg-vb_ctd.json
+verse013,validation,/kaggle/input/verse-19-3d-images/dataset-verse19validation/rawdata/sub-verse013/sub-verse013_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse013/sub-verse013_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse013/sub-verse013_seg-vb_ctd.json
+verse014,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse014/sub-verse014_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse014/sub-verse014_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse014/sub-verse014_seg-vb_ctd.json
+verse015,train,/kaggle/input/verse-19-3d-images/dataset-verse19training/rawdata/sub-verse015/sub-verse015_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse015/sub-verse015_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19training/derivatives/sub-verse015/sub-verse015_seg-vb_ctd.json
+verse016,validation,/kaggle/input/verse-19-3d-images/dataset-verse19validation/rawdata/sub-verse016/sub-verse016_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse016/sub-verse016_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse016/sub-verse016_seg-vb_ctd.json
+verse018,validation,/kaggle/input/verse-19-3d-images/dataset-verse19validation/rawdata/sub-verse018/sub-verse018_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse018/sub-verse018_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19validation/derivatives/sub-verse018/sub-verse018_seg-vb_ctd.json
+verse020,test,/kaggle/input/verse-19-3d-images/dataset-verse19test/rawdata/sub-verse020/sub-verse020_ct.nii,/kaggle/input/verse-19-3d-images/dataset-verse19test/derivatives/sub-verse020/sub-verse020_seg-vert_msk.nii,/kaggle/input/verse-19-3d-images/dataset-verse19test/derivatives/sub-verse020/sub-verse020_seg-vb_ctd.json
