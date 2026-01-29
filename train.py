@@ -19,8 +19,15 @@ Usage:
     # Train all folds for a stage
     python train.py --stage spine --csv data.csv --output outputs/ --all_folds
 """
+
+import sys
 import argparse
 from pathlib import Path
+
+# Fix imports by adding parent directory to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 
 from config import (
     SpineLocalizationConfig,
@@ -117,6 +124,20 @@ def main():
         help='Override learning rate'
     )
     
+    parser.add_argument(
+        '--spine_model_path',
+        type=str,
+        default=None,
+        help='Path to Stage 1 (Spine Localization) checkpoint to use for Stage 2 training'
+    )
+    
+    parser.add_argument(
+        '--vertebrae_model_path',
+        type=str,
+        default=None,
+        help='Path to Stage 2 (Vertebrae Localization) checkpoint to use for Stage 3 training'
+    )
+    
     args = parser.parse_args()
     
     # Create output directory
@@ -172,7 +193,12 @@ def main():
             config.learning_rate = args.lr
         
         stage_output = output_path / 'vertebrae_localization'
-        spine_model_dir = output_path / 'spine_localization' / 'checkpoints'
+        
+        # Determine spine model path: use provided path or fall back to expected path
+        if args.spine_model_path:
+            spine_model_dir_resolved = Path(args.spine_model_path).parent if Path(args.spine_model_path).is_file() else Path(args.spine_model_path)
+        else:
+            spine_model_dir_resolved = output_path / 'spine_localization' / 'checkpoints'
         
         if args.fold < 0:
             train_all_folds_vertebrae(
@@ -181,10 +207,15 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                spine_model_dir=str(spine_model_dir) if spine_model_dir.exists() else None
+                spine_model_dir=str(spine_model_dir_resolved) if spine_model_dir_resolved.exists() else None
             )
         else:
-            spine_model = spine_model_dir / f'fold_{args.fold}' / 'best.pth'
+            # If specific model path provided, use it directly; otherwise construct path
+            if args.spine_model_path:
+                spine_model_to_use = Path(args.spine_model_path)
+            else:
+                spine_model_to_use = spine_model_dir_resolved / f'fold_{args.fold}' / 'best.pth'
+            
             train_vertebrae_localization(
                 csv_path=args.csv,
                 output_dir=str(stage_output),
@@ -192,7 +223,7 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                spine_model_path=str(spine_model) if spine_model.exists() else None,
+                spine_model_path=str(spine_model_to_use) if spine_model_to_use.exists() else None,
                 resume_from=args.resume
             )
     
@@ -210,7 +241,12 @@ def main():
             config.learning_rate = args.lr
         
         stage_output = output_path / 'vertebrae_segmentation'
-        loc_model_dir = output_path / 'vertebrae_localization' / 'checkpoints'
+        
+        # Determine vertebrae localization model path: use provided path or fall back to expected path
+        if args.vertebrae_model_path:
+            loc_model_dir_resolved = Path(args.vertebrae_model_path).parent if Path(args.vertebrae_model_path).is_file() else Path(args.vertebrae_model_path)
+        else:
+            loc_model_dir_resolved = output_path / 'vertebrae_localization' / 'checkpoints'
         
         if args.fold < 0:
             train_all_folds_segmentation(
@@ -219,10 +255,15 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                localization_model_dir=str(loc_model_dir) if loc_model_dir.exists() else None
+                localization_model_dir=str(loc_model_dir_resolved) if loc_model_dir_resolved.exists() else None
             )
         else:
-            loc_model = loc_model_dir / f'fold_{args.fold}' / 'best.pth'
+            # If specific model path provided, use it directly; otherwise construct path
+            if args.vertebrae_model_path:
+                loc_model_to_use = Path(args.vertebrae_model_path)
+            else:
+                loc_model_to_use = loc_model_dir_resolved / f'fold_{args.fold}' / 'best.pth'
+            
             train_vertebrae_segmentation(
                 csv_path=args.csv,
                 output_dir=str(stage_output),
@@ -230,7 +271,7 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                localization_model_path=str(loc_model) if loc_model.exists() else None,
+                localization_model_path=str(loc_model_to_use) if loc_model_to_use.exists() else None,
                 resume_from=args.resume
             )
     
