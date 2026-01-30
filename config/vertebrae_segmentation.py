@@ -11,7 +11,7 @@ class VertebraeSegmentationConfig:
     
     # Training parameters
     batch_size: int = 1
-    max_epochs: int = 300
+    num_epochs: int = 300
     max_iter: int = 50000
     learning_rate: float = 1e-4
     learning_rate_milestones: List[int] = field(default_factory=lambda: [20000, 30000])
@@ -57,6 +57,9 @@ class VertebraeSegmentationConfig:
     
     # Cross-validation
     n_folds: int = 5
+    
+    # DataLoader parameters
+    num_workers: int = 4  # Number of workers for data loading
     
     # Post-processing
     min_component_size: int = 1000  # Minimum connected component size

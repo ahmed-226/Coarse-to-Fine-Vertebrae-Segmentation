@@ -9,8 +9,8 @@ import torch
 import torch.nn as nn
 from scipy import ndimage
 
-from ..config.vertebrae_segmentation import VertebraeSegmentationConfig
-from ..models.unet3d import UNet3DVertebraeSegmentation
+from config.vertebrae_segmentation import VertebraeSegmentationConfig
+from models.unet3d import UNet3DVertebraeSegmentation
 from .predictor import BasePredictor
 
 

@@ -7,8 +7,8 @@ import numpy as np
 import SimpleITK as sitk
 import torch.nn as nn
 
-from ..config.spine_localization import SpineLocalizationConfig
-from ..models.unet3d import UNet3DSpineLocalization
+from config.spine_localization import SpineLocalizationConfig
+from models.unet3d import UNet3DSpineLocalization
 from .predictor import BasePredictor
 
 

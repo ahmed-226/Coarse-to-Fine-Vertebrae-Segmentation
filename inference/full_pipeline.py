@@ -8,9 +8,9 @@ import json
 import numpy as np
 import SimpleITK as sitk
 
-from ..config.spine_localization import SpineLocalizationConfig
-from ..config.vertebrae_localization import VertebraeLocalizationConfig
-from ..config.vertebrae_segmentation import VertebraeSegmentationConfig
+from config.spine_localization import SpineLocalizationConfig
+from config.vertebrae_localization import VertebraeLocalizationConfig
+from config.vertebrae_segmentation import VertebraeSegmentationConfig
 from .spine_predictor import SpineLocalizationPredictor
 from .vertebrae_predictor import VertebraeLocalizationPredictor
 from .segmentation_predictor import VertebraeSegmentationPredictor

@@ -8,8 +8,8 @@ import SimpleITK as sitk
 import torch
 import torch.nn as nn
 
-from ..config.vertebrae_localization import VertebraeLocalizationConfig
-from ..models.scnet import SpatialConfigurationNet
+from config.vertebrae_localization import VertebraeLocalizationConfig
+from models.scnet import SpatialConfigurationNet
 from .predictor import BasePredictor
 
 

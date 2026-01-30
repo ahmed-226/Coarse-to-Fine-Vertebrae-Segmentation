@@ -11,7 +11,7 @@ class SpineLocalizationConfig:
     
     # Training parameters
     batch_size: int = 1
-    max_epochs: int = 200
+    num_epochs: int = 200
     max_iter: int = 20000
     learning_rate: float = 1e-4
     learning_rate_milestones: List[int] = field(default_factory=lambda: [10000, 15000])
@@ -51,3 +51,6 @@ class SpineLocalizationConfig:
     
     # Cross-validation
     n_folds: int = 5
+    
+    # DataLoader parameters
+    num_workers: int = 4  # Number of workers for data loading

@@ -122,11 +122,12 @@ class UNet3D(nn.Module):
             self.combiners.append(CombineBlock(method='concat'))
             
             # Convolution block (input is concatenated channels)
-            combined_channels = self.filters[level] + self.filters[level + 1] if level < num_levels - 1 else self.filters[level] + self.filters[-1]
+            # Skip has filters[level] channels, upsampled has filters[level+1] channels
+            combined_channels = self.filters[level] + self.filters[level + 1]
             
             self.decoders.append(
                 ConvBlock3D(
-                    in_channels=self.filters[level] * 2,  # Skip + upsampled
+                    in_channels=combined_channels,  # Skip + upsampled concatenated
                     out_channels=self.filters[level],
                     kernel_size=kernel_size,
                     padding=kernel_size // 2,

@@ -24,10 +24,9 @@ import sys
 import argparse
 from pathlib import Path
 
-# Fix imports by adding parent directory to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
+# Fix imports: add current directory to Python path
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
 
 from config import (
     SpineLocalizationConfig,
@@ -36,15 +35,11 @@ from config import (
 )
 from training import (
     train_spine_localization,
-    train_all_folds as train_all_folds_spine
-)
-from training.train_vertebrae_localization import (
+    train_all_folds_spine,
     train_vertebrae_localization,
-    train_all_folds as train_all_folds_vertebrae
-)
-from training.train_vertebrae_segmentation import (
+    train_all_folds_vertebrae,
     train_vertebrae_segmentation,
-    train_all_folds as train_all_folds_segmentation
+    train_all_folds_segmentation
 )
 
 

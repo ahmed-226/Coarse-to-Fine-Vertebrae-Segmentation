@@ -11,7 +11,7 @@ class VertebraeLocalizationConfig:
     
     # Training parameters
     batch_size: int = 1
-    max_epochs: int = 500
+    num_epochs: int = 500
     max_iter: int = 100000
     learning_rate: float = 1e-8
     learning_rate_milestones: List[int] = field(default_factory=lambda: [50000, 75000])
@@ -56,6 +56,9 @@ class VertebraeLocalizationConfig:
     
     # Cross-validation
     n_folds: int = 5
+    
+    # DataLoader parameters
+    num_workers: int = 4  # Number of workers for data loading
     
     # Sliding window for testing
     cropped_inc: Tuple[int, int, int, int] = (0, 96, 0, 0)

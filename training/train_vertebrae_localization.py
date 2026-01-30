@@ -13,10 +13,10 @@ import torch.nn as nn
 import numpy as np
 from scipy import ndimage
 
-from ..config.vertebrae_localization import VertebraeLocalizationConfig
-from ..models.scnet import SpatialConfigurationNet
-from ..data.dataset import VertebraeLocalizationDataset
-from ..data.transforms import get_train_transforms, get_val_transforms
+from config.vertebrae_localization import VertebraeLocalizationConfig
+from models.scnet import SpatialConfigurationNet
+from data.dataset import VertebraeLocalizationDataset
+from data.transforms import get_train_transforms, get_val_transforms
 from .trainer import BaseTrainer
 from .losses import CombinedLocalizationLoss
 
@@ -79,20 +79,24 @@ class VertebraeLocalizationTrainer(BaseTrainer):
         
         train_dataset = VertebraeLocalizationDataset(
             csv_path=self.csv_path,
-            config=self.config,
+            split='train',
             fold=self.fold,
-            num_folds=self.num_folds,
-            is_train=True,
-            transform=train_transforms
+            transform=train_transforms,
+            image_size=self.config.image_size,
+            image_spacing=self.config.image_spacing,
+            num_landmarks=self.config.num_landmarks,
+            heatmap_sigma=self.config.heatmap_sigma
         )
         
         val_dataset = VertebraeLocalizationDataset(
             csv_path=self.csv_path,
-            config=self.config,
+            split='val',
             fold=self.fold,
-            num_folds=self.num_folds,
-            is_train=False,
-            transform=val_transforms
+            transform=val_transforms,
+            image_size=self.config.image_size,
+            image_spacing=self.config.image_spacing,
+            num_landmarks=self.config.num_landmarks,
+            heatmap_sigma=self.config.heatmap_sigma
         )
         
         return train_dataset, val_dataset

@@ -170,7 +170,7 @@ class SpineLocalizationDataset(VerSe19Dataset):
         # Build sample dict
         sample = {
             'image': image_resampled,
-            'target': target,
+            'heatmap': target,
             'name': sample_info['name'],
             'spine_center': spine_center_resampled,
             'original_spacing': original_spacing,
@@ -299,7 +299,7 @@ class VertebraeLocalizationDataset(VerSe19Dataset):
         # Build sample dict
         sample = {
             'image': image_resampled,
-            'target': target,
+            'heatmaps': target,
             'valid_mask': valid_mask,
             'name': sample_info['name'],
             'landmarks': landmarks_resampled,
@@ -431,7 +431,7 @@ class VertebraeSegmentationDataset(VerSe19Dataset):
         sample = {
             'image': image_resampled,
             'heatmap': heatmap,
-            'target': target,
+            'mask': target,
             'name': sample_info['name'],
             'vertebra_label': vert_label,
             'original_spacing': original_spacing,
