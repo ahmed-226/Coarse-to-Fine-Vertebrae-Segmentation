@@ -43,7 +43,8 @@ class BaseTrainer(ABC):
         num_folds: int = 5,
         device: str = 'cuda',
         seed: int = 42,
-        resume_from: Optional[str] = None
+        resume_from: Optional[str] = None,
+        multi_gpu: bool = False
     ):
         """
         Args:
@@ -55,6 +56,7 @@ class BaseTrainer(ABC):
             device: Device to train on ('cuda' or 'cpu')
             seed: Random seed for reproducibility
             resume_from: Path to checkpoint to resume from
+            multi_gpu: Whether to use multiple GPUs if available
         """
         self.config = config
         self.output_dir = Path(output_dir)
@@ -64,6 +66,7 @@ class BaseTrainer(ABC):
         self.device = torch.device(device if torch.cuda.is_available() else 'cpu')
         self.seed = seed
         self.resume_from = resume_from
+        self.multi_gpu = multi_gpu
         
         # Set seeds for reproducibility
         self._set_seed()
@@ -117,6 +120,11 @@ class BaseTrainer(ABC):
         # Create model
         self.model = self.create_model()
         self.model = self.model.to(self.device)
+        
+        # Multi-GPU support
+        if self.multi_gpu and torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs for training\n")
+            self.model = nn.DataParallel(self.model)
         
         # Print model summary
         total_params = sum(p.numel() for p in self.model.parameters())

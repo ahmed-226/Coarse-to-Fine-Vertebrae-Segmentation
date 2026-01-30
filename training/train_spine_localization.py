@@ -38,6 +38,7 @@ class SpineLocalizationTrainer(BaseTrainer):
         num_folds: int = 5,
         device: str = 'cuda',
         config: Optional[SpineLocalizationConfig] = None,
+        multi_gpu: bool = False,
         **kwargs
     ):
         if config is None:
@@ -50,6 +51,7 @@ class SpineLocalizationTrainer(BaseTrainer):
             fold=fold,
             num_folds=num_folds,
             device=device,
+            multi_gpu=multi_gpu,
             **kwargs
         )
     
@@ -271,7 +273,8 @@ def train_spine_localization(
     num_folds: int = 5,
     device: str = 'cuda',
     config: Optional[SpineLocalizationConfig] = None,
-    resume_from: Optional[str] = None
+    resume_from: Optional[str] = None,
+    multi_gpu: bool = False
 ) -> float:
     """
     Train spine localization model for one fold.
@@ -284,6 +287,7 @@ def train_spine_localization(
         device: Device to train on
         config: Optional configuration object
         resume_from: Optional checkpoint path to resume from
+        multi_gpu: Whether to use multiple GPUs if available
     
     Returns:
         Best validation loss
@@ -295,7 +299,8 @@ def train_spine_localization(
         num_folds=num_folds,
         device=device,
         config=config,
-        resume_from=resume_from
+        resume_from=resume_from,
+        multi_gpu=multi_gpu
     )
     
     best_metric = trainer.train()
@@ -308,7 +313,8 @@ def train_all_folds(
     output_dir: str,
     num_folds: int = 5,
     device: str = 'cuda',
-    config: Optional[SpineLocalizationConfig] = None
+    config: Optional[SpineLocalizationConfig] = None,
+    multi_gpu: bool = False
 ) -> Dict[int, float]:
     """
     Train spine localization model for all folds.
@@ -319,6 +325,7 @@ def train_all_folds(
         num_folds: Number of cross-validation folds
         device: Device to train on
         config: Optional configuration object
+        multi_gpu: Whether to use multiple GPUs if available
     
     Returns:
         Dictionary mapping fold index to best validation loss
@@ -336,7 +343,8 @@ def train_all_folds(
             fold=fold,
             num_folds=num_folds,
             device=device,
-            config=config
+            config=config,
+            multi_gpu=multi_gpu
         )
         
         results[fold] = best_metric

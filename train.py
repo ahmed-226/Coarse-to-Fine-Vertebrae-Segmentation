@@ -133,6 +133,12 @@ def main():
         help='Path to Stage 2 (Vertebrae Localization) checkpoint to use for Stage 3 training'
     )
     
+    parser.add_argument(
+        '--multi_gpu',
+        action='store_true',
+        help='Use multiple GPUs if available'
+    )
+    
     args = parser.parse_args()
     
     # Create output directory
@@ -161,7 +167,8 @@ def main():
                 output_dir=str(stage_output),
                 num_folds=args.num_folds,
                 device=args.device,
-                config=config
+                config=config,
+                multi_gpu=args.multi_gpu
             )
         else:
             train_spine_localization(
@@ -171,7 +178,8 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                resume_from=args.resume
+                resume_from=args.resume,
+                multi_gpu=args.multi_gpu
             )
     
     if args.stage == 'vertebrae' or args.stage == 'all':
@@ -202,7 +210,8 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                spine_model_dir=str(spine_model_dir_resolved) if spine_model_dir_resolved.exists() else None
+                spine_model_dir=str(spine_model_dir_resolved) if spine_model_dir_resolved.exists() else None,
+                multi_gpu=args.multi_gpu
             )
         else:
             # If specific model path provided, use it directly; otherwise construct path
@@ -219,7 +228,8 @@ def main():
                 device=args.device,
                 config=config,
                 spine_model_path=str(spine_model_to_use) if spine_model_to_use.exists() else None,
-                resume_from=args.resume
+                resume_from=args.resume,
+                multi_gpu=args.multi_gpu
             )
     
     if args.stage == 'segmentation' or args.stage == 'all':
@@ -250,7 +260,8 @@ def main():
                 num_folds=args.num_folds,
                 device=args.device,
                 config=config,
-                localization_model_dir=str(loc_model_dir_resolved) if loc_model_dir_resolved.exists() else None
+                localization_model_dir=str(loc_model_dir_resolved) if loc_model_dir_resolved.exists() else None,
+                multi_gpu=args.multi_gpu
             )
         else:
             # If specific model path provided, use it directly; otherwise construct path
@@ -267,7 +278,8 @@ def main():
                 device=args.device,
                 config=config,
                 localization_model_path=str(loc_model_to_use) if loc_model_to_use.exists() else None,
-                resume_from=args.resume
+                resume_from=args.resume,
+                multi_gpu=args.multi_gpu
             )
     
     print("\n" + "="*60)
