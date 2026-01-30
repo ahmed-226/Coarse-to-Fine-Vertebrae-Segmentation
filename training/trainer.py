@@ -410,20 +410,24 @@ class BaseTrainer(ABC):
         epoch_time: float
     ):
         """Print epoch summary to console."""
-        print(f"\n{'='*60}")
-        print(f"Epoch {epoch}/{self.config.num_epochs-1} | Time: {epoch_time:.1f}s")
-        print(f"{'='*60}")
+        print(f"\nEpoch {epoch}/{self.config.num_epochs-1} | ", end="")
         
-        print(f"Train Loss: {train_losses['total']:.4f}")
-        print(f"Val Loss:   {val_losses['total']:.4f}")
+        # Train losses
+        print(f"Train: ", end="")
+        for key, value in train_losses.items():
+            print(f"{key}={value:.4f} ", end="")
+        
+        # Val losses and metrics
+        print(f"| Val: ", end="")
+        for key, value in val_losses.items():
+            print(f"{key}={value:.4f} ", end="")
         
         if val_metrics:
-            print(f"\nMetrics:")
             for key, value in val_metrics.items():
-                print(f"  {key}: {value:.4f}")
+                if isinstance(value, (int, float)):
+                    print(f"{key}={value:.4f} ", end="")
         
-        print(f"\nBest: {self.best_metric:.4f} @ epoch {self.best_epoch}")
-        print(f"LR: {self.optimizer.param_groups[0]['lr']:.2e}")
+        print(f"| Time={epoch_time:.1f}s LR={self.optimizer.param_groups[0]['lr']:.2e}")
     
     def _save_checkpoint(self, is_best: bool = False):
         """Save model checkpoint."""
@@ -477,7 +481,7 @@ class BaseTrainer(ABC):
         print(f"Resumed from epoch {self.current_epoch}, best metric: {self.best_metric:.4f}")
     
     def _save_history(self):
-        """Save training history to JSON."""
+        """Save training history to JSON with all metrics and losses."""
         history = {
             'train': self.train_history,
             'val': self.val_history,
@@ -490,7 +494,20 @@ class BaseTrainer(ABC):
         with open(history_path, 'w') as f:
             json.dump(history, f, indent=2)
         
-        print(f"Training history saved to {history_path}")
+        print(f"\n" + "="*60)
+        print(f"Training Complete!")
+        print(f"="*60)
+        print(f"History saved to: {history_path}")
+        print(f"Best metric: {self.best_metric:.6f} at epoch {self.best_epoch}")
+        
+        # Show what metrics were tracked
+        if self.val_history and len(self.val_history) > 0:
+            print(f"\nMetrics tracked in JSON:")
+            first_epoch = self.val_history[0]
+            for key in first_epoch.keys():
+                if key != 'epoch':
+                    print(f"  ✓ {key}")
+        print(f"="*60)
     
     def load_best_model(self) -> nn.Module:
         """Load the best model checkpoint."""
