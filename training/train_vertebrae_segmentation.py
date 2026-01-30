@@ -39,11 +39,13 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         device: str = 'cuda',
         config: Optional[VertebraeSegmentationConfig] = None,
         localization_model_path: Optional[str] = None,
+        multi_gpu: bool = False,
         **kwargs
     ):
         """
         Args:
             localization_model_path: Path to trained vertebrae localization model
+            multi_gpu: Whether to use multiple GPUs if available
         """
         if config is None:
             config = VertebraeSegmentationConfig()
@@ -57,13 +59,13 @@ class VertebraeSegmentationTrainer(BaseTrainer):
             fold=fold,
             num_folds=num_folds,
             device=device,
+            multi_gpu=multi_gpu,
             **kwargs
         )
     
     def create_model(self) -> nn.Module:
         """Create U-Net for vertebrae segmentation."""
         model = UNet3DVertebraeSegmentation(
-            in_channels=1,
             num_filters_base=self.config.num_filters_base,
             num_levels=self.config.num_levels
         )
@@ -108,18 +110,23 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         Single training step.
         
         Args:
-            batch: Dictionary with 'image' and 'mask' tensors
+            batch: Dictionary with 'input' (image+heatmap) and 'mask' tensors
         
         Returns:
             Dictionary with loss values
         """
         self.optimizer.zero_grad()
         
-        image = batch['image']  # [B, 1, D, H, W]
+        # Input is concatenated image + heatmap [B, 2, D, H, W]
+        image_input = batch.get('input', batch.get('image', None))
+        if image_input is None:
+            # Fallback: concatenate image and heatmap if input not provided
+            image_input = torch.cat([batch['image'], batch['heatmap']], dim=1)
+        
         target = batch['mask']  # [B, 1, D, H, W]
         
         # Forward pass
-        pred = self.model(image)  # [B, 1, D, H, W]
+        pred = self.model(image_input)  # [B, 1, D, H, W]
         
         # Compute loss
         loss = self.loss_fn(pred, target)
@@ -144,16 +151,21 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         Single validation step.
         
         Args:
-            batch: Dictionary with 'image' and 'mask' tensors
+            batch: Dictionary with 'input' (image+heatmap) and 'mask' tensors
         
         Returns:
             Dictionary with losses, predictions, and targets
         """
-        image = batch['image']
+        # Input is concatenated image + heatmap [B, 2, D, H, W]
+        image_input = batch.get('input', batch.get('image', None))
+        if image_input is None:
+            # Fallback: concatenate image and heatmap if input not provided
+            image_input = torch.cat([batch['image'], batch['heatmap']], dim=1)
+        
         target = batch['mask']
         
         # Forward pass
-        pred = self.model(image)
+        pred = self.model(image_input)
         
         # Compute loss
         loss = self.loss_fn(pred, target)
@@ -168,8 +180,12 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         for i in range(pred.shape[0]):
             pred_mask = (torch.sigmoid(pred[i, 0]) > 0.5).cpu().numpy()
             target_mask = target[i, 0].cpu().numpy()
-            spacing = batch['spacing'][i].cpu().numpy() if 'spacing' in batch else self.config.image_spacing
-            vertebra_id = batch['vertebra_id'][i].item() if 'vertebra_id' in batch else None
+            spacing = batch.get('spacing', self.config.image_spacing)
+            if isinstance(spacing, torch.Tensor):
+                spacing = spacing.cpu().numpy()
+            vertebra_id = batch.get('vertebra_label', None)
+            if vertebra_id is not None and isinstance(vertebra_id, torch.Tensor):
+                vertebra_id = vertebra_id.item() if len(vertebra_id.shape) == 0 else vertebra_id[i].item()
             
             predictions.append({
                 'mask': pred_mask,
@@ -380,7 +396,8 @@ def train_vertebrae_segmentation(
     device: str = 'cuda',
     config: Optional[VertebraeSegmentationConfig] = None,
     localization_model_path: Optional[str] = None,
-    resume_from: Optional[str] = None
+    resume_from: Optional[str] = None,
+    multi_gpu: bool = False
 ) -> float:
     """
     Train vertebrae segmentation model for one fold.
@@ -406,7 +423,8 @@ def train_vertebrae_segmentation(
         device=device,
         config=config,
         localization_model_path=localization_model_path,
-        resume_from=resume_from
+        resume_from=resume_from,
+        multi_gpu=multi_gpu
     )
     
     best_metric = trainer.train()

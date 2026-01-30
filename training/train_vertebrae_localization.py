@@ -39,11 +39,13 @@ class VertebraeLocalizationTrainer(BaseTrainer):
         device: str = 'cuda',
         config: Optional[VertebraeLocalizationConfig] = None,
         spine_model_path: Optional[str] = None,
+        multi_gpu: bool = False,
         **kwargs
     ):
         """
         Args:
             spine_model_path: Path to trained spine localization model for cropping
+            multi_gpu: Whether to use multiple GPUs if available
         """
         if config is None:
             config = VertebraeLocalizationConfig()
@@ -57,13 +59,13 @@ class VertebraeLocalizationTrainer(BaseTrainer):
             fold=fold,
             num_folds=num_folds,
             device=device,
+            multi_gpu=multi_gpu,
             **kwargs
         )
     
     def create_model(self) -> nn.Module:
         """Create SCNet for vertebrae localization."""
         model = SpatialConfigurationNet(
-            in_channels=1,
             num_landmarks=self.config.num_landmarks,
             num_filters_base=self.config.num_filters_base,
             num_levels=self.config.num_levels,
@@ -170,7 +172,9 @@ class VertebraeLocalizationTrainer(BaseTrainer):
             pred_heatmaps = pred[i].cpu().numpy()  # [N, D, H, W]
             target_landmarks = batch['landmarks'][i].cpu().numpy() if 'landmarks' in batch else None
             mask = valid_mask[i].cpu().numpy() if valid_mask is not None else None
-            spacing = batch['spacing'][i].cpu().numpy() if 'spacing' in batch else self.config.image_spacing
+            spacing = batch.get('spacing', self.config.image_spacing)
+            if isinstance(spacing, torch.Tensor):
+                spacing = spacing.cpu().numpy()
             
             # Find peaks in predicted heatmaps
             pred_landmarks = self._find_all_peaks(pred_heatmaps, mask)
@@ -363,7 +367,8 @@ def train_vertebrae_localization(
     device: str = 'cuda',
     config: Optional[VertebraeLocalizationConfig] = None,
     spine_model_path: Optional[str] = None,
-    resume_from: Optional[str] = None
+    resume_from: Optional[str] = None,
+    multi_gpu: bool = False
 ) -> float:
     """
     Train vertebrae localization model for one fold.
@@ -389,7 +394,8 @@ def train_vertebrae_localization(
         device=device,
         config=config,
         spine_model_path=spine_model_path,
-        resume_from=resume_from
+        resume_from=resume_from,
+        multi_gpu=multi_gpu
     )
     
     best_metric = trainer.train()

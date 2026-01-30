@@ -296,13 +296,22 @@ class VertebraeLocalizationDataset(VerSe19Dataset):
         # Valid vertebrae mask
         valid_mask = get_valid_vertebrae_mask(landmarks, self.num_landmarks)
         
-        # Build sample dict
+        # Build sample dict (convert landmarks to tensor for batch collation)
+        # Convert landmarks dict to ordered array [num_landmarks, 3]
+        landmarks_array = np.zeros((self.num_landmarks, 3), dtype=np.float32)
+        for label_str, coords in landmarks_resampled.items():
+            if label_str.isdigit():
+                label_idx = int(label_str)
+                if 0 <= label_idx < self.num_landmarks:
+                    landmarks_array[label_idx] = coords
+        
         sample = {
             'image': image_resampled,
             'heatmaps': target,
             'valid_mask': valid_mask,
             'name': sample_info['name'],
-            'landmarks': landmarks_resampled,
+            'landmarks': landmarks_array,
+            'spacing': self.image_spacing,
             'spine_center': spine_center_voxel,
             'original_spacing': original_spacing,
             'size': self.image_size
@@ -434,6 +443,7 @@ class VertebraeSegmentationDataset(VerSe19Dataset):
             'mask': target,
             'name': sample_info['name'],
             'vertebra_label': vert_label,
+            'spacing': self.image_spacing,
             'original_spacing': original_spacing,
             'size': self.image_size
         }
