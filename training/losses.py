@@ -254,7 +254,9 @@ class CombinedLocalizationLoss(nn.Module):
         
         # Sigma regularization
         if sigma is not None:
-            losses['sigma'] = self.sigma_loss(sigma, valid_mask[0] if valid_mask is not None else None)
+            # Average valid_mask across batch: [B, N] -> [N]
+            batch_valid_mask = valid_mask.mean(dim=0) if valid_mask is not None else None
+            losses['sigma'] = self.sigma_loss(sigma, batch_valid_mask)
         else:
             losses['sigma'] = torch.tensor(0.0, device=pred.device)
         

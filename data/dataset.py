@@ -299,11 +299,17 @@ class VertebraeLocalizationDataset(VerSe19Dataset):
         # Build sample dict (convert landmarks to tensor for batch collation)
         # Convert landmarks dict to ordered array [num_landmarks, 3]
         landmarks_array = np.zeros((self.num_landmarks, 3), dtype=np.float32)
-        for label_str, coords in landmarks_resampled.items():
-            if label_str.isdigit():
-                label_idx = int(label_str)
-                if 0 <= label_idx < self.num_landmarks:
-                    landmarks_array[label_idx] = coords
+        for label, coords in landmarks_resampled.items():
+            # Handle both int and string keys
+            if isinstance(label, int):
+                label_idx = label
+            elif isinstance(label, str) and label.isdigit():
+                label_idx = int(label)
+            else:
+                continue
+            
+            if 0 <= label_idx < self.num_landmarks:
+                landmarks_array[label_idx] = coords
         
         sample = {
             'image': image_resampled,

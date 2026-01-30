@@ -128,7 +128,9 @@ class VertebraeLocalizationTrainer(BaseTrainer):
         valid_mask = batch.get('valid_mask', None)  # [B, N]
         
         # Forward pass
-        pred, sigma = self.model(image)  # pred: [B, N, D, H, W], sigma: [N, 3]
+        pred = self.model(image)  # [B, N, D, H, W]
+        # Get learnable sigma from model [N, 3]
+        sigma = self.model.sigma if hasattr(self.model, 'sigma') else None
         
         # Compute loss
         losses = self.loss_fn(pred, target, sigma, valid_mask)
@@ -159,7 +161,9 @@ class VertebraeLocalizationTrainer(BaseTrainer):
         valid_mask = batch.get('valid_mask', None)
         
         # Forward pass
-        pred, sigma = self.model(image)
+        pred = self.model(image)  # [B, N, D, H, W]
+        # Get learnable sigma from model [N, 3]
+        sigma = self.model.sigma if hasattr(self.model, 'sigma') else None
         
         # Compute loss
         losses = self.loss_fn(pred, target, sigma, valid_mask)
@@ -306,7 +310,7 @@ class VertebraeLocalizationTrainer(BaseTrainer):
             valid_mask = pred['valid_mask']
             spacing = pred['spacing']
             
-            for i in range(len(vertebra_names)):
+            for i in range(len(pred_landmarks)):
                 if valid_mask is not None and not valid_mask[i]:
                     continue
                 
