@@ -180,9 +180,18 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         for i in range(pred.shape[0]):
             pred_mask = (torch.sigmoid(pred[i, 0]) > 0.5).cpu().numpy()
             target_mask = target[i, 0].cpu().numpy()
+            
+            # Extract spacing for this sample
             spacing = batch.get('spacing', self.config.image_spacing)
             if isinstance(spacing, torch.Tensor):
                 spacing = spacing.cpu().numpy()
+            
+            # Handle batch dimension in spacing: if shape is [B, 3], extract [i]
+            if spacing.ndim == 2 and spacing.shape[0] == pred.shape[0]:
+                spacing = spacing[i]
+            elif spacing.ndim != 1:
+                spacing = np.asarray(spacing).flatten()
+            
             vertebra_id = batch.get('vertebra_label', None)
             if vertebra_id is not None and isinstance(vertebra_id, torch.Tensor):
                 vertebra_id = vertebra_id.item() if len(vertebra_id.shape) == 0 else vertebra_id[i].item()
@@ -345,6 +354,9 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         if pred_surface.sum() == 0 or target_surface.sum() == 0:
             return np.inf
         
+        # Ensure spacing is 1D
+        spacing = np.asarray(spacing).flatten()
+        
         # Distance transforms
         pred_coords = np.array(np.where(pred_surface)).T * spacing
         target_coords = np.array(np.where(target_surface)).T * spacing
@@ -369,6 +381,9 @@ class VertebraeSegmentationTrainer(BaseTrainer):
         
         if pred_surface.sum() == 0 or target_surface.sum() == 0:
             return np.inf
+        
+        # Ensure spacing is 1D
+        spacing = np.asarray(spacing).flatten()
         
         pred_coords = np.array(np.where(pred_surface)).T * spacing
         target_coords = np.array(np.where(target_surface)).T * spacing
@@ -438,7 +453,8 @@ def train_all_folds(
     num_folds: int = 5,
     device: str = 'cuda',
     config: Optional[VertebraeSegmentationConfig] = None,
-    localization_model_dir: Optional[str] = None
+    localization_model_dir: Optional[str] = None,
+    multi_gpu: bool = False
 ) -> Dict[int, float]:
     """
     Train vertebrae segmentation model for all folds.
@@ -472,7 +488,8 @@ def train_all_folds(
             num_folds=num_folds,
             device=device,
             config=config,
-            localization_model_path=localization_model_path
+            localization_model_path=localization_model_path,
+            multi_gpu=multi_gpu
         )
         
         results[fold] = best_metric

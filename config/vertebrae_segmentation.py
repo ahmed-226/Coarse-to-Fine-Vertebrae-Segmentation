@@ -33,6 +33,10 @@ class VertebraeSegmentationConfig:
     # Input channels: image + heatmap prior
     input_channels: int = 2
     
+    # Loss function weights
+    dice_weight: float = 0.5
+    bce_weight: float = 0.5
+    
     # Heatmap parameters
     input_gaussian_sigma: float = 0.75
     label_gaussian_sigma: float = 1.0
