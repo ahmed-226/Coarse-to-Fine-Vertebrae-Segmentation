@@ -413,7 +413,8 @@ def train_all_folds(
     num_folds: int = 5,
     device: str = 'cuda',
     config: Optional[VertebraeLocalizationConfig] = None,
-    spine_model_dir: Optional[str] = None
+    spine_model_dir: Optional[str] = None,
+    multi_gpu: bool = False
 ) -> Dict[int, float]:
     """
     Train vertebrae localization model for all folds.
@@ -425,6 +426,7 @@ def train_all_folds(
         device: Device to train on
         config: Optional configuration object
         spine_model_dir: Directory containing spine models for each fold
+        multi_gpu: Whether to use multiple GPUs if available
     
     Returns:
         Dictionary mapping fold index to best validation loss
@@ -447,7 +449,8 @@ def train_all_folds(
             num_folds=num_folds,
             device=device,
             config=config,
-            spine_model_path=spine_model_path
+            spine_model_path=spine_model_path,
+            multi_gpu=multi_gpu
         )
         
         results[fold] = best_metric
